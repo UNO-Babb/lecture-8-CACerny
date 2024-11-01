@@ -21,16 +21,12 @@ def main():
 
   outFile.close()
 
-  import csv
-import os
+  import os
 
 # Define file names
 hitting_file = "MLB_Hitting.csv"
 pitching_file = "MLB_Pitching.csv"
 combined_file = "MLB_Combined.csv"
-
-# Get the current working directory
-print("Current working directory:", os.getcwd())
 
 # Step 1: Read hitting data
 hitting_data = {}
@@ -39,8 +35,8 @@ with open(hitting_file, 'r') as hf:
     header = hf.readline().strip().split(",")
     # Get indices for relevant columns
     team_index = header.index("Tm")
-    runs_per_game_index = header.index("RA/G")
-    
+    runs_per_game_index = header.index("R/G")
+
     for line in hf:
         row = line.strip().split(",")
         team_name = row[team_index]
@@ -58,7 +54,7 @@ with open(pitching_file, 'r') as pf:
     wins_index = header.index("W")
     losses_index = header.index("L")
     era_index = header.index("ERA")
-    
+
     for line in pf:
         row = line.strip().split(",")
         team_name = row[team_index]
@@ -69,24 +65,23 @@ with open(pitching_file, 'r') as pf:
             era = float(row[era_index])
 
             # Prepare the combined row
-            combined_row = {
-                'Team Name': team_name,
-                'Runs Scored Per Game': hitting_data[team_name],
-                'Runs Allowed Per Game': runs_allowed_per_game,
-                'Wins': wins,
-                'Losses': losses,
-                'ERA': era
-            }
+            combined_row = [
+                team_name,
+                hitting_data[team_name],
+                runs_allowed_per_game,
+                wins,
+                losses,
+                era
+            ]
             combined_data.append(combined_row)
 
 # Step 3: Save the combined data to a new CSV file
 with open(combined_file, 'w', newline='') as cf:
-    fieldnames = ['Team Name', 'Runs Scored Per Game', 'Runs Allowed Per Game', 'Wins', 'Losses', 'ERA']
-    writer = csv.DictWriter(cf, fieldnames=fieldnames)
-    
-    writer.writeheader()
+    # Write the header
+    cf.write("Team Name,Runs Scored Per Game,Runs Allowed Per Game,Wins,Losses,ERA\n")
     for data in combined_data:
-        writer.writerow(data)
+        # Join the data list into a comma-separated string and write to the file
+        cf.write(",".join(map(str, data)) + "\n")
 
 print(f"Combined data saved to {combined_file}.")
 
